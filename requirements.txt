@@ -1,0 +1,6 @@
+https://github.com/piccolo-orm/piccolo/archive/master.zip
+piccolo-admin
+asyncpg
+aiosqlite
+hypercorn
+python-dotenv
