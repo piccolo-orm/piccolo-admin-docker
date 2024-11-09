@@ -1,6 +1,7 @@
-https://github.com/piccolo-orm/piccolo/archive/master.zip
-piccolo-admin
 asyncpg
 aiosqlite
 hypercorn
+piccolo
+piccolo-admin
+piccolo_api[authenticator,pynacl]
 python-dotenv
