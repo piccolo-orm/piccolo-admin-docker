@@ -5,7 +5,7 @@ Experimenting with using a dockerized Piccolo Admin with an existing (legacy) da
 Clone repository.
 
 ```bash
-git clone https://github.com/sinisaos/piccolo-admin-docker.git
+git clone https://github.com/piccolo-orm/piccolo-admin-docker.git
 ```
 
 Creating an `.env` file.
@@ -21,7 +21,7 @@ Creating a Docker image.
 docker build -t piccolo_admin .
 ```
 
-Running a Docker image (using the `--network=host` flag because I'm using an existing database from the local machine).
+Running a Docker image (use the `--network=host` flag for an existing database from the local machine).
 
 ```bash
 docker run -d --network=host --name admin_container piccolo_admin

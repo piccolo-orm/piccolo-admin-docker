@@ -10,16 +10,17 @@ from piccolo.engine.sqlite import SQLiteEngine
 from piccolo.table import create_db_tables
 from piccolo.table_reflection import TableStorage
 from piccolo_admin import create_admin
+from piccolo_api.encryption.providers import XChaCha20Provider
+from piccolo_api.mfa.authenticator.provider import AuthenticatorProvider
+from piccolo_api.mfa.authenticator.tables import (
+    AuthenticatorSecret as AuthenticatorSecret_,
+)
 from piccolo_api.session_auth.tables import SessionsBase
 
-DB = SQLiteEngine("app/admin_user.db")
+DB = SQLiteEngine()
 
 
 load_dotenv(find_dotenv())
-
-
-USERNAME = "piccolo"
-PASSWORD = "piccolo123"
 
 
 class Sessions(SessionsBase, db=DB):
@@ -30,15 +31,22 @@ class User(BaseUser, tablename="piccolo_user", db=DB):
     pass
 
 
+class AuthenticatorSecret(AuthenticatorSecret_, db=DB):
+    pass
+
+
 async def main():
     # Create auth tables in separate Sqlite DB
-    await create_db_tables(*[User, Sessions], if_not_exists=True)
+    await create_db_tables(
+        *[User, Sessions, AuthenticatorSecret],
+        if_not_exists=True,
+    )
     # Create a admin user in separate Sqlite DB
-    if not await User.exists().where(User.email == "admin@test.com"):
+    if not await User.exists().where(User.email == os.environ["EMAIL"]):
         user = User(
-            username=USERNAME,
-            password=PASSWORD,
-            email="admin@test.com",
+            username=os.environ["USERNAME"],
+            password=os.environ["PASSWORD"],
+            email=os.environ["EMAIL"],
             admin=True,
             active=True,
             superuser=True,
@@ -72,6 +80,16 @@ async def main():
         auth_table=User,
         session_table=Sessions,
         auto_include_related=False,
+        mfa_providers=[
+            AuthenticatorProvider(
+                encryption_provider=XChaCha20Provider(
+                    encryption_key=os.environb[b"ENCRIPTION_KEY"]
+                    .decode("unicode-escape")
+                    .encode("latin-1")
+                ),
+                secret_table=AuthenticatorSecret,
+            ),
+        ],
     )
 
     # Server
