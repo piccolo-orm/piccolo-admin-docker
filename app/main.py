@@ -42,11 +42,11 @@ async def main():
         if_not_exists=True,
     )
     # Create a admin user in separate Sqlite DB
-    if not await User.exists().where(User.email == "admin@test.com"):
+    if not await User.exists().where(User.email == os.environ["EMAIL"]):
         user = User(
             username=os.environ["USERNAME"],
             password=os.environ["PASSWORD"],
-            email="admin@test.com",
+            email=os.environ["EMAIL"],
             admin=True,
             active=True,
             superuser=True,
