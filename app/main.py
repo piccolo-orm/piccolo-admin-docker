@@ -60,13 +60,23 @@ async def main():
         extensions=tuple(),
     )
 
+    tables_to_show = [
+        table_to_show.lower().strip()
+        for table_to_show in os.environ["TABLES_TO_SHOW"].split(",")
+    ]
+
     storage = TableStorage(engine=db)
     await storage.reflect(schema_name="public")
 
-    # This tuple IS unique
-    # however auto_include_related within
-    # create_admin makes it non unique TableConfigs
-    found_tables = storage.tables.values()
+    # tables to show in admin
+    if len(tables_to_show) == 1:
+        found_tables = storage.tables.values()
+    else:
+        found_tables = [
+            table
+            for table in storage.tables.values()
+            if table._meta.tablename in tables_to_show
+        ]
 
     for table_class in found_tables:
         table_class._meta._db = db
