@@ -1,7 +1,6 @@
 import asyncio
 import os
 
-from dotenv import find_dotenv, load_dotenv
 from hypercorn import Config
 from hypercorn.asyncio import serve
 from piccolo.apps.user.tables import BaseUser
@@ -18,9 +17,6 @@ from piccolo_api.mfa.authenticator.tables import (
 from piccolo_api.session_auth.tables import SessionsBase
 
 DB = SQLiteEngine()
-
-
-load_dotenv(find_dotenv())
 
 
 class Sessions(SessionsBase, db=DB):
@@ -64,16 +60,29 @@ async def main():
         extensions=tuple(),
     )
 
+    tables_to_show = [
+        table_to_show.lower().strip()
+        for table_to_show in os.environ["TABLES_TO_SHOW"].split(",")
+    ]
+
     storage = TableStorage(engine=db)
     await storage.reflect(schema_name="public")
 
-    # This tuple IS unique
-    # however auto_include_related within
-    # create_admin makes it non unique TableConfigs
-    found_tables = storage.tables.values()
+    # tables to show in admin
+    if len(tables_to_show) == 1:
+        found_tables = storage.tables.values()
+    else:
+        found_tables = [
+            table
+            for table in storage.tables.values()
+            if table._meta.tablename in tables_to_show
+        ]
 
     for table_class in found_tables:
         table_class._meta._db = db
+
+    # create new encription key for MFA
+    encryption_key = XChaCha20Provider.get_new_key()
 
     app = create_admin(
         found_tables,
@@ -83,9 +92,7 @@ async def main():
         mfa_providers=[
             AuthenticatorProvider(
                 encryption_provider=XChaCha20Provider(
-                    encryption_key=os.environb[b"ENCRIPTION_KEY"]
-                    .decode("unicode-escape")
-                    .encode("latin-1")
+                    encryption_key=encryption_key,
                 ),
                 secret_table=AuthenticatorSecret,
             ),
