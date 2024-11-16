@@ -33,5 +33,7 @@ tables:
   #   visible_filters:
   #     - country_id
   #     - country
-  #   menu_group: Location
 
+sidebar_links:
+  # Piccolo Admin: https://piccolo-admin.readthedocs.io/en/latest/index.html
+  # Piccolo ORM: https://piccolo-orm.readthedocs.io/en/latest/index.html

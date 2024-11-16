@@ -20,7 +20,7 @@ from piccolo_api.session_auth.tables import SessionsBase
 with open("config.yaml") as stream:
     try:
         admin_config = yaml.safe_load(stream)
-        BASE_CONFIG = admin_config["tables"]
+        BASE_CONFIG = admin_config.get("tables")
     except yaml.YAMLError as exc:
         raise exc
 
@@ -82,22 +82,41 @@ async def main():
         admin_tables = []
         for table in found_tables:
             capitalize_table_name = table._meta.tablename.capitalize()
+            # visible columns
+            try:
+                visible_columns = [
+                    column
+                    for column in table._meta.columns
+                    if column._meta.name
+                    in BASE_CONFIG[capitalize_table_name].get(
+                        "visible_columns", None
+                    )
+                ]
+            except TypeError:
+                visible_columns = None
+            # visible filters
+            try:
+                visible_filters = [
+                    column
+                    for column in table._meta.columns
+                    if column._meta.name
+                    in BASE_CONFIG[capitalize_table_name].get(
+                        "visible_filters", None
+                    )
+                ]
+            except TypeError:
+                visible_filters = None
+            # menu_group
+            menu_group = BASE_CONFIG[capitalize_table_name].get(
+                "menu_group", None
+            )
+
             admin_tables.append(
                 TableConfig(
                     table_class=table,
-                    visible_columns=[
-                        column
-                        for column in table._meta.columns
-                        if column._meta.name
-                        in BASE_CONFIG[capitalize_table_name]["visible_columns"]
-                    ],
-                    visible_filters=[
-                        column
-                        for column in table._meta.columns
-                        if column._meta.name
-                        in BASE_CONFIG[capitalize_table_name]["visible_filters"]
-                    ],
-                    menu_group=BASE_CONFIG[capitalize_table_name]["menu_group"],
+                    visible_columns=visible_columns,
+                    visible_filters=visible_filters,
+                    menu_group=menu_group,
                 )
             )
     else:
@@ -125,6 +144,7 @@ async def main():
                 secret_table=AuthenticatorSecret,
             ),
         ],
+        sidebar_links=admin_config.get("sidebar_links", None),
     )
 
     # Server
