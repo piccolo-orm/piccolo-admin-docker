@@ -8,6 +8,7 @@ tables:
   #     - actor_id
   #     - first_name
   #   menu_group: Movies
+  #   link_column: first_name
   # Address:
   #   visible_columns:
   #     - address_id
@@ -18,6 +19,7 @@ tables:
   #     - address
   #     - city_id
   #   menu_group: Location
+  #   rich_text_columns: address # it only works in the Text type column
   # City:
   #   visible_columns:
   #     - city_id
