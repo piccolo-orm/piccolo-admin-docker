@@ -4,3 +4,4 @@ hypercorn
 piccolo
 piccolo-admin
 piccolo_api[authenticator,pynacl]
+pyyaml

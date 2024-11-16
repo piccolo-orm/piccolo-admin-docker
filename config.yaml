@@ -1,0 +1,37 @@
+tables:
+  # An example of additional Piccolo Admin configuration
+  # Actor:
+  #   visible_columns:
+  #     - actor_id
+  #     - first_name
+  #   visible_filters:
+  #     - actor_id
+  #     - first_name
+  #   menu_group: Movies
+  # Address:
+  #   visible_columns:
+  #     - address_id
+  #     - address
+  #     - city_id
+  #   visible_filters:
+  #     - address_id
+  #     - address
+  #     - city_id
+  #   menu_group: Location
+  # City:
+  #   visible_columns:
+  #     - city_id
+  #     - city
+  #   visible_filters:
+  #     - city_id
+  #     - city
+  #   menu_group: Location
+  # Country:
+  #   visible_columns:
+  #     - country_id
+  #     - country
+  #   visible_filters:
+  #     - country_id
+  #     - country
+  #   menu_group: Location
+
