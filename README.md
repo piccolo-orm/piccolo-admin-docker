@@ -27,3 +27,56 @@ Stop the Docker container.
 ```bash
 docker-compose down
 ```
+
+### Additional Piccolo Admin configuration
+
+Piccolo Admin has a flexible UI with lots of configuration options to display only the columns you want your users to see. More information on Piccolo Admin [docs](https://piccolo-admin.readthedocs.io/en/latest/index.html).
+
+After Piccolo Admin is started with all the tables from the existing database, we can do additional configuration through the `config.yaml` file. 
+
+Example of `config.yaml`:
+
+```yaml
+tables:
+  # An example of additional Piccolo Admin configuration
+  Actor:
+    visible_columns:
+      - actor_id
+      - first_name
+    visible_filters:
+      - actor_id
+      - first_name
+    menu_group: Movies
+  Address:
+    visible_columns:
+      - address_id
+      - address
+      - city_id
+    visible_filters:
+      - address_id
+      - address
+      - city_id
+    menu_group: Location
+  City:
+    visible_columns:
+      - city_id
+      - city
+    visible_filters:
+      - city_id
+      - city
+    menu_group: Location
+  Country:
+    visible_columns:
+      - country_id
+      - country
+    visible_filters:
+      - country_id
+      - country
+    menu_group: Location
+```
+
+For these changes to take effect, you must stop the container and rebuild it with.
+
+```bash
+docker-compose up -d --build
+```
