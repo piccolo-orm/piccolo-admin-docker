@@ -119,12 +119,17 @@ async def main():
             except TypeError:
                 rich_text_columns = None
             # link column
-            link_column = [
-                column
-                for column in table._meta.columns
-                if column._meta.name
-                == BASE_CONFIG[capitalize_table_name].get("link_column", None)
-            ]
+            try:
+                link_column = [
+                    column
+                    for column in table._meta.columns
+                    if column._meta.name
+                    == BASE_CONFIG[capitalize_table_name].get(
+                        "link_column", None
+                    )
+                ][0]
+            except IndexError:
+                link_column = None
             # menu_group
             menu_group = BASE_CONFIG[capitalize_table_name].get(
                 "menu_group", None
@@ -136,7 +141,7 @@ async def main():
                     visible_columns=visible_columns,
                     visible_filters=visible_filters,
                     rich_text_columns=rich_text_columns,
-                    link_column=None if link_column == [] else link_column[0],
+                    link_column=link_column,
                     menu_group=menu_group,
                 )
             )

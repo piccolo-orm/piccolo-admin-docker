@@ -1,4 +1,4 @@
-Experimenting with using a dockerized Piccolo Admin with an existing (legacy) database.
+Dockerized Piccolo Admin to use existing (legacy) database.
 
 ### Usage
 
@@ -41,12 +41,12 @@ tables:
   # An example of additional Piccolo Admin configuration
   Actor:
     visible_columns:
-      - actor_id
       - first_name
     visible_filters:
       - actor_id
       - first_name
     menu_group: Movies
+    link_column: first_name
   Address:
     visible_columns:
       - address_id
@@ -57,6 +57,7 @@ tables:
       - address
       - city_id
     menu_group: Location
+    rich_text_columns: address
   City:
     visible_columns:
       - city_id
@@ -73,6 +74,10 @@ tables:
       - country_id
       - country
     menu_group: Location
+
+sidebar_links:
+  Piccolo Admin: https://piccolo-admin.readthedocs.io/en/latest/index.html
+  Piccolo ORM: https://piccolo-orm.readthedocs.io/en/latest/index.html
 ```
 
 For these changes to take effect, you must stop the container and rebuild it with.
