@@ -1,0 +1,9 @@
+services:
+  web:
+    build: .
+    command: python app/main.py
+    volumes:
+      - .:/app
+    env_file:
+      - .env
+    network_mode: "host"
