@@ -52,17 +52,23 @@ async def main():
             for table in storage.tables.values():
                 if table._meta.tablename == config.table_name:
                     # visible columns
-                    visible_columns = [
-                        column
-                        for column in table._meta.columns
-                        if column._meta.name in config.visible_columns
-                    ]
+                    try:
+                        visible_columns = [
+                            column
+                            for column in table._meta.columns
+                            if column._meta.name in config.visible_columns
+                        ]
+                    except TypeError:
+                        visible_columns = table._meta.columns
                     # visible filters
-                    visible_filters = [
-                        column
-                        for column in table._meta.columns
-                        if column._meta.name in config.visible_filters
-                    ]
+                    try:
+                        visible_filters = [
+                            column
+                            for column in table._meta.columns
+                            if column._meta.name in config.visible_filters
+                        ]
+                    except TypeError:
+                        visible_filters = table._meta.columns
                     # rich text columns
                     rich_text_columns = [
                         column
