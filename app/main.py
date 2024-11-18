@@ -1,42 +1,16 @@
 import asyncio
 import os
 
-import yaml
 from hypercorn import Config
 from hypercorn.asyncio import serve
-from piccolo.apps.user.tables import BaseUser
 from piccolo.engine import PostgresEngine
-from piccolo.engine.sqlite import SQLiteEngine
 from piccolo.table import create_db_tables
 from piccolo.table_reflection import TableStorage
 from piccolo_admin.endpoints import TableConfig, create_admin
 from piccolo_api.encryption.providers import XChaCha20Provider
 from piccolo_api.mfa.authenticator.provider import AuthenticatorProvider
-from piccolo_api.mfa.authenticator.tables import (
-    AuthenticatorSecret as AuthenticatorSecret_,
-)
-from piccolo_api.session_auth.tables import SessionsBase
-
-with open("config.yaml") as stream:
-    try:
-        admin_config = yaml.safe_load(stream)
-        BASE_CONFIG = admin_config.get("tables")
-    except yaml.YAMLError as exc:
-        raise exc
-
-DB = SQLiteEngine()
-
-
-class Sessions(SessionsBase, db=DB):
-    pass
-
-
-class User(BaseUser, tablename="piccolo_user", db=DB):
-    pass
-
-
-class AuthenticatorSecret(AuthenticatorSecret_, db=DB):
-    pass
+from tables import AuthenticatorSecret, Sessions, User
+from utils import additional_config
 
 
 async def main():
@@ -72,79 +46,51 @@ async def main():
     await storage.reflect(schema_name="public")
 
     # additional configuration of admin tables
-    if BASE_CONFIG is not None:
-        tables_to_show = [table.lower() for table in BASE_CONFIG]
-        found_tables = [
-            table
-            for table in storage.tables.values()
-            if table._meta.tablename in tables_to_show
-        ]
+    if additional_config.tables is not None:
         admin_tables = []
-        for table in found_tables:
-            capitalize_table_name = table._meta.tablename.capitalize()
-            # visible columns
-            try:
-                visible_columns = [
-                    column
-                    for column in table._meta.columns
-                    if column._meta.name
-                    in BASE_CONFIG[capitalize_table_name].get(
-                        "visible_columns", None
-                    )
-                ]
-            except TypeError:
-                visible_columns = None
-            # visible filters
-            try:
-                visible_filters = [
-                    column
-                    for column in table._meta.columns
-                    if column._meta.name
-                    in BASE_CONFIG[capitalize_table_name].get(
-                        "visible_filters", None
-                    )
-                ]
-            except TypeError:
-                visible_filters = None
-            # rich text columns
-            try:
-                rich_text_columns = [
-                    column
-                    for column in table._meta.columns
-                    if column._meta.name
-                    in BASE_CONFIG[capitalize_table_name].get(
-                        "rich_text_columns", None
-                    )
-                ]
-            except TypeError:
-                rich_text_columns = None
-            # link column
-            try:
-                link_column = [
-                    column
-                    for column in table._meta.columns
-                    if column._meta.name
-                    == BASE_CONFIG[capitalize_table_name].get(
-                        "link_column", None
-                    )
-                ][0]
-            except IndexError:
-                link_column = None
-            # menu_group
-            menu_group = BASE_CONFIG[capitalize_table_name].get(
-                "menu_group", None
-            )
+        for config in additional_config.tables:
+            for table in storage.tables.values():
+                if table._meta.tablename == config.table_name:
+                    # visible columns
+                    visible_columns = [
+                        column
+                        for column in table._meta.columns
+                        if column._meta.name in config.visible_columns
+                    ]
+                    # visible filters
+                    visible_filters = [
+                        column
+                        for column in table._meta.columns
+                        if column._meta.name in config.visible_filters
+                    ]
+                    # rich text columns
+                    rich_text_columns = [
+                        column
+                        for column in table._meta.columns
+                        if column._meta.name == config.rich_text_columns
+                    ]
+                    # link column
+                    try:
+                        link_column = [
+                            column
+                            for column in table._meta.columns
+                            if column._meta.name == config.link_column
+                        ][0]
+                    except IndexError:
+                        link_column = None
+                    # menu_group
+                    menu_group = config.menu_group
 
-            admin_tables.append(
-                TableConfig(
-                    table_class=table,
-                    visible_columns=visible_columns,
-                    visible_filters=visible_filters,
-                    rich_text_columns=rich_text_columns,
-                    link_column=link_column,
-                    menu_group=menu_group,
-                )
-            )
+                    admin_tables.append(
+                        TableConfig(
+                            table_class=table,
+                            visible_columns=visible_columns,
+                            visible_filters=visible_filters,
+                            rich_text_columns=rich_text_columns,
+                            link_column=link_column,
+                            menu_group=menu_group,
+                        )
+                    )
     else:
         admin_tables = storage.tables.values()
 
@@ -170,7 +116,7 @@ async def main():
                 secret_table=AuthenticatorSecret,
             ),
         ],
-        sidebar_links=admin_config.get("sidebar_links", None),
+        sidebar_links=additional_config.sidebar_links or {},
     )
 
     # Server

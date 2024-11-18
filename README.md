@@ -39,7 +39,7 @@ Example of `config.yaml`:
 ```yaml
 tables:
   # An example of additional Piccolo Admin configuration
-  Actor:
+  - table_name: actor
     visible_columns:
       - first_name
     visible_filters:
@@ -47,7 +47,7 @@ tables:
       - first_name
     menu_group: Movies
     link_column: first_name
-  Address:
+  - table_name: address
     visible_columns:
       - address_id
       - address
@@ -58,7 +58,7 @@ tables:
       - city_id
     menu_group: Location
     rich_text_columns: address
-  City:
+  - table_name: city
     visible_columns:
       - city_id
       - city
@@ -66,14 +66,13 @@ tables:
       - city_id
       - city
     menu_group: Location
-  Country:
+  - table_name: country
     visible_columns:
       - country_id
       - country
     visible_filters:
       - country_id
       - country
-    menu_group: Location
 
 sidebar_links:
   Piccolo Admin: https://piccolo-admin.readthedocs.io/en/latest/index.html
