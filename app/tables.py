@@ -5,7 +5,7 @@ from piccolo_api.mfa.authenticator.tables import (
 )
 from piccolo_api.session_auth.tables import SessionsBase
 
-DB = SQLiteEngine()
+DB = SQLiteEngine("/data/auth.sqlite")
 
 
 class Sessions(SessionsBase, db=DB):
