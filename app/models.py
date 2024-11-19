@@ -7,7 +7,7 @@ class AdminTable(BaseModel):
     table_name: t.Optional[str] = None
     visible_columns: t.Optional[list[str]] = None
     visible_filters: t.Optional[list[str]] = None
-    rich_text_columns: t.Optional[str] = None
+    rich_text_columns: t.Optional[list[str]] = None
     link_column: t.Optional[str] = None
     menu_group: t.Optional[str] = None
 

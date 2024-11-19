@@ -52,37 +52,35 @@ async def main():
             for table in storage.tables.values():
                 if table._meta.tablename == config.table_name:
                     # visible columns
-                    try:
+                    if config.visible_columns:
                         visible_columns = [
-                            column
-                            for column in table._meta.columns
-                            if column._meta.name in config.visible_columns
+                            table._meta.get_column_by_name(column_name)
+                            for column_name in config.visible_columns
                         ]
-                    except TypeError:
+                    else:
                         visible_columns = table._meta.columns
                     # visible filters
-                    try:
+                    if config.visible_filters:
                         visible_filters = [
-                            column
-                            for column in table._meta.columns
-                            if column._meta.name in config.visible_filters
+                            table._meta.get_column_by_name(column_name)
+                            for column_name in config.visible_filters
                         ]
-                    except TypeError:
+                    else:
                         visible_filters = table._meta.columns
                     # rich text columns
-                    rich_text_columns = [
-                        column
-                        for column in table._meta.columns
-                        if column._meta.name == config.rich_text_columns
-                    ]
+                    if config.rich_text_columns:
+                        rich_text_columns = [
+                            table._meta.get_column_by_name(column_name)
+                            for column_name in config.rich_text_columns
+                        ]
+                    else:
+                        rich_text_columns = None
                     # link column
-                    try:
-                        link_column = [
-                            column
-                            for column in table._meta.columns
-                            if column._meta.name == config.link_column
-                        ][0]
-                    except IndexError:
+                    if config.link_column:
+                        link_column = table._meta.get_column_by_name(
+                            config.link_column
+                        )
+                    else:
                         link_column = None
                     # menu_group
                     menu_group = config.menu_group

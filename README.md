@@ -57,7 +57,8 @@ tables:
       - address
       - city_id
     menu_group: Location
-    rich_text_columns: address
+    rich_text_columns: 
+      - address
   - table_name: city
     visible_columns:
       - city_id
