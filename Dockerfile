@@ -2,7 +2,7 @@ FROM python:3.13-slim
 
 WORKDIR /app
 
-COPY ./requirements.txt /app/requirements.txt
+COPY ./requirements.txt ./requirements.txt
 
 COPY ./config.yaml /app/config.yaml
 
