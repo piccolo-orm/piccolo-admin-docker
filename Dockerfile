@@ -6,7 +6,7 @@ COPY ./requirements.txt /app/requirements.txt
 
 COPY ./config.yaml /app/config.yaml
 
-VOLUME /app/data
+VOLUME /data
 
 RUN pip install --no-cache-dir -r /app/requirements.txt
 

@@ -7,13 +7,12 @@ from piccolo_api.mfa.authenticator.tables import (
 )
 from piccolo_api.session_auth.tables import SessionsBase
 
-try:
-    Path(Path(__file__).parent.parent / "data").mkdir()
-except FileExistsError:
-    pass
+DATA_DIR = Path(__file__).parent.parent / "data"
 
-DB_PATH = Path("data").absolute() / "auth.sqlite"
-DB = SQLiteEngine(str(DB_PATH))
+if not DATA_DIR.exists():
+    DATA_DIR.mkdir()
+
+DB = SQLiteEngine(str(DATA_DIR / "auth.sqlite"))
 
 
 class Sessions(SessionsBase, db=DB):
