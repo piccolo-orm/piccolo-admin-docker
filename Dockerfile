@@ -1,15 +1,16 @@
 FROM python:3.13-slim
 
-WORKDIR /code
+WORKDIR /app
 
-COPY ./requirements.txt /code/requirements.txt
+COPY ./requirements.txt /app/requirements.txt
 
-COPY ./config.yaml /code/config.yaml
+COPY ./config.yaml /app/config.yaml
 
 VOLUME /data
+# VOLUME /app/data # use this if we want the data as a directory
 
-RUN pip install --no-cache-dir -r /code/requirements.txt
+RUN pip install --no-cache-dir -r /app/requirements.txt
 
-COPY ./app /code/app
+COPY ./app /app
 
-CMD ["python", "app/main.py"]
+CMD ["python", "main.py"]
