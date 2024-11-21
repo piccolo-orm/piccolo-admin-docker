@@ -1,11 +1,15 @@
-FROM python:3.11-slim
+FROM python:3.13-slim
 
-WORKDIR /code
+WORKDIR /app
 
-COPY ./requirements.txt /code/requirements.txt
+COPY ./requirements.txt /requirements.txt
 
-COPY ./config.yaml /code/config.yaml
+COPY ./config.yaml /app/config.yaml
 
-RUN pip install --no-cache-dir -r /code/requirements.txt
+VOLUME /data
 
-COPY ./app /code/app
+RUN pip install --no-cache-dir -r /requirements.txt
+
+COPY ./app /app
+
+CMD ["python", "main.py"]
